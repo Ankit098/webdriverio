@@ -161,7 +161,8 @@ describe('constructor', () => {
         capabilities: []
     }
 
-    it('should add the wdioService property to an array of capabilities', async () => {
+    it('should add the wdioService property to an array of capabilities, if webdriverio >= 7', async () => {
+        process.env.npm_package_dependencies_webdriverio = '7.19.7'
         const caps: any = [{}, {}]
         new BrowserstackLauncher(options, caps, config)
 
@@ -169,5 +170,20 @@ describe('constructor', () => {
             { 'bstack:options': { wdioService: bstackServiceVersion } },
             { 'bstack:options': { wdioService: bstackServiceVersion } }
         ])
+    })
+
+    it('should add the browserstack.wdioService property to an array of capabilities, if webdriverio < 7', async () => {
+        process.env.npm_package_dependencies_webdriverio = '5.4.3'
+        const caps: any = [{}, {}]
+        new BrowserstackLauncher(options, caps, config)
+
+        expect(caps).toEqual([
+            { 'browserstack.wdioService': bstackServiceVersion },
+            { 'browserstack.wdioService': bstackServiceVersion },
+        ])
+    })
+
+    afterEach(() => {
+        delete process.env.npm_package_dependencies_webdriverio
     })
 })
